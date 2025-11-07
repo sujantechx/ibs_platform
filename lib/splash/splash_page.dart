@@ -17,7 +17,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   _navigateToHome() async {
-    await Future.delayed(const Duration(milliseconds: 1500), () {});
+    await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     // Use GoRouter to navigate when using MaterialApp.router
     context.go(AppRoutes.home);

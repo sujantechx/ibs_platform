@@ -16,7 +16,7 @@ import 'app_route_constants.dart';
 
 
 // 3. Import your core pages (Splash, Home, Login, etc.)
-import '../../courses/ui/presentation/screens/splash/splash_screen.dart';
+import '../../splash/splash_page.dart';
 import '../../home/home_page.dart';
 import '../../courses/ui/presentation/screens/auth/login_screen.dart';
 import '../../courses/ui/presentation/screens/auth/register_screen.dart';
@@ -40,7 +40,7 @@ class AppRouter {
         // --- Core App Routes ---
         GoRoute(
             path: AppRoutes.splash,
-            builder: (context, state) => const SplashScreen()),
+            builder: (context, state) => const SplashPage()),
         GoRoute(
             path: AppRoutes.home,
             builder: (context, state) => const HomePage()),
