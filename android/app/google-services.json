@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "471270629661",
+    "project_id": "ibs-platform-7348a",
+    "storage_bucket": "ibs-platform-7348a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:471270629661:android:ffa1db1f6f86dd0af5c1f4",
+        "android_client_info": {
+          "package_name": "com.example.ibs_platform"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "471270629661-fe5hvjacf8aa20t49f3gehrg60hp54d0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCiI5Sd-nLNdOc-yOHi639OsQfnj41YGpk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "471270629661-fe5hvjacf8aa20t49f3gehrg60hp54d0.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "471270629661-9mkm62erk778jm8fa7budkvc75sp5ije.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.ibsPlatform"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
