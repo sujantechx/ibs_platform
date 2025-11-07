@@ -1,70 +1,119 @@
 import 'package:flutter/material.dart';
-import 'package:ibs_platform/calendar/ui/calendar_dashboard.dart';
-import 'package:ibs_platform/japa_counter/ui/japa_counter_dashboard.dart';
-import 'package:ibs_platform/vaishnav_puran/ui/vaishnav_puran_dashboard.dart';
-import 'package:ibs_platform/vaishnav_song/ui/vaishnav_song_dashboard.dart';
+import 'package:go_router/go_router.dart'; // Import go_router
+import 'package:ibs_platform/core/routes/app_route_constants.dart'; // Import common constants
+import 'package:ibs_platform/core/routes/course_routes.dart'; // Import course-specific route constants
 
-import '../courses/ui/presentation/screens/splash/splash_screen.dart';
+// A simple class to hold the data for each grid item
+class _GridItem {
+  const _GridItem({
+    required this.icon,
+    required this.label,
+    required this.routePath, // This is the GoRouter path
+  });
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
-
-  @override
-  State<HomePage> createState() => _HomePageState();
+  final IconData icon;
+  final String label;
+  final String routePath;
 }
 
-class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0;
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
 
-  static final List<Widget> _widgetOptions = <Widget>[
-    SplashScreen(),
-    const CalendarDashboard(),
-    const JapaCounterDashboard(),
-    const VaishnavPuranDashboard(),
-    const VaishnavSongDashboard(),
+  // Create a list of your grid items using the route constants
+  static final List<_GridItem> _gridItems = <_GridItem>[
+    _GridItem(
+      icon: Icons.school,
+      label: 'Courses',
+      // This path goes to the first tab of your Student Dashboard
+      // point to the public courses list which is provided in the main router
+      routePath: AppRoutesCourses.publicCourses,
+    ),
+    _GridItem(
+      icon: Icons.calendar_today,
+      label: 'Calendar',
+      routePath: AppRoutes.calendar,
+    ),
+    _GridItem(
+      icon: Icons.add_circle_outline,
+      label: 'Japa',
+      routePath: AppRoutes.japaCounter,
+    ),
+    _GridItem(
+      icon: Icons.book,
+      label: 'Puran',
+      routePath: AppRoutes.vaishnavPuran,
+    ),
+    _GridItem(
+      icon: Icons.music_note,
+      label: 'Songs',
+      routePath: AppRoutes.vaishnavSong,
+    ),
   ];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: _widgetOptions.elementAt(_selectedIndex),
+      appBar: AppBar(
+        title: const Text('IBS Platform'),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.school),
-            label: 'Courses',
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: GridView.builder(
+          itemCount: _gridItems.length,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            crossAxisSpacing: 16.0,
+            mainAxisSpacing: 16.0,
+            childAspectRatio: 1.1,
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.calendar_today),
-            label: 'Calendar',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.add_circle_outline),
-            label: 'Japa',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.book),
-            label: 'Puran',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.music_note),
-            label: 'Songs',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).primaryColor,
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
+          itemBuilder: (BuildContext context, int index) {
+            final item = _gridItems[index];
+            return _GridItemTile(item: item);
+          },
+        ),
       ),
     );
   }
 }
 
+class _GridItemTile extends StatelessWidget {
+  const _GridItemTile({required this.item});
+
+  final _GridItem item;
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4.0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12.0),
+      ),
+      child: InkWell(
+        onTap: () {
+          // --- USE context.push() FOR NAVIGATION ---
+          context.push(item.routePath);
+        },
+        borderRadius: BorderRadius.circular(12.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Icon(
+              item.icon,
+              size: 50.0,
+              color: Theme.of(context).primaryColor,
+            ),
+            const SizedBox(height: 16.0),
+            Text(
+              item.label,
+              style: const TextStyle(
+                fontSize: 16.0,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

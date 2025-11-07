@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:ibs_platform/core/routes/app_routes.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ibs_platform/core/routes/app_route_constants.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -17,7 +18,9 @@ class _SplashPageState extends State<SplashPage> {
 
   _navigateToHome() async {
     await Future.delayed(const Duration(milliseconds: 1500), () {});
-    Navigator.pushReplacementNamed(context, AppRoutes.home);
+    if (!mounted) return;
+    // Use GoRouter to navigate when using MaterialApp.router
+    context.go(AppRoutes.home);
   }
 
   @override
@@ -29,4 +32,3 @@ class _SplashPageState extends State<SplashPage> {
     );
   }
 }
-

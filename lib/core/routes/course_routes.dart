@@ -1,5 +1,11 @@
 // lib/core/routes/app_routes.dart
 
+import 'package:go_router/go_router.dart';
+import '../../courses/data/models/courses_moddel.dart';
+import '../../courses/ui/presentation/screens/Courses/public_courses_screen.dart';
+import '../../courses/ui/presentation/screens/Courses/course_detail_page.dart';
+import '../../courses/ui/presentation/screens/Courses/qr_payment_screen.dart';
+
 class AppRoutesCourses {
 
   // Core & Authentication Routes
@@ -49,4 +55,26 @@ class AppRoutesCourses {
   static const String publicCourses = '/publicCourses'; // Make this the root
   static const String courseDetail = '/course-detail';
   static const String qrPayment = '/qr-payment';
+
+  // New: expose a list of GoRouter routes so the main AppRouter can spread them
+  static List<RouteBase> get routes => [
+        GoRoute(
+          path: publicCourses,
+          builder: (context, state) => const PublicCoursesScreen(),
+        ),
+        GoRoute(
+          path: courseDetail,
+          builder: (context, state) {
+            final course = state.extra as CoursesModel;
+            return CourseDetailPage(course: course);
+          },
+        ),
+        GoRoute(
+          path: qrPayment,
+          builder: (context, state) {
+            final course = state.extra as CoursesModel;
+            return QrPaymentScreen(course: course);
+          },
+        ),
+      ];
 }

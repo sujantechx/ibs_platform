@@ -21,7 +21,7 @@ class AppRoutes {
       case splash:
         return MaterialPageRoute(builder: (_) => const SplashPage());
       case home:
-        return MaterialPageRoute(builder: (_) => const HomePage());
+        return MaterialPageRoute(builder: (_) => HomePage());
       case calendar:
         return MaterialPageRoute(builder: (_) => const CalendarDashboard());
       case courses:
