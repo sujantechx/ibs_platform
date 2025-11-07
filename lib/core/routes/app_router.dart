@@ -76,6 +76,7 @@ class AppRouter {
         // These can be accessed by anyone, anytime.
         final isPublicRoute = [
           AppRoutes.splash,
+          AppRoutes.home,
           AppRoutesCourses.publicCourses,
           AppRoutesCourses.courseDetail,
           AppRoutesCourses.qrPayment,
@@ -84,8 +85,11 @@ class AppRouter {
         ].contains(currentLocation);
 
         // --- 1. Handle Initial and Loading States ---
+        // While the auth bloc is still initializing/loading, do not perform
+        // any redirects. This avoids bounce behaviour where Splash -> Home
+        // gets immediately redirected back to Splash.
         if (authState is AuthInitial || authState is AuthLoading) {
-          return isPublicRoute ? null : AppRoutes.splash;
+          return null;
         }
 
         // --- 2. Handle Unauthenticated State ---
