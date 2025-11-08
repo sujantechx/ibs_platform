@@ -32,7 +32,8 @@ class PuranListScreen extends StatelessWidget {
                     title: Text(puran.title),
                     subtitle: Text(puran.description),
                     onTap: () {
-                      context.go('/puran/${puran.id}/subjects');
+                      final location = '/puran/${puran.id}/subjects';
+                      context.push(location);
                     },
                   );
                 },

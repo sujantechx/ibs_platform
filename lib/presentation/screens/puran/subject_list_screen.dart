@@ -34,7 +34,7 @@ class SubjectListScreen extends StatelessWidget {
                     title: Text(subject.title),
                     subtitle: Text(subject.description),
                     onTap: () {
-                      context.go('/puran/$puranId/subjects/${subject.id}/chapters');
+                      context.push('/puran/$puranId/subjects/${subject.id}/chapters');
                     },
                   );
                 },

@@ -23,6 +23,7 @@ import '../../presentation/screens/auth/login_screen.dart';
 import '../../presentation/screens/auth/register_screen.dart';
 import '../../presentation/screens/dashboard/student_dashboard_screen.dart';
 import '../../presentation/screens/profile/profile_screen.dart';
+import '../../presentation/screens/puran/chapter_content_screen.dart';
 import '../../presentation/screens/splash/splash_screen.dart';
 import '../../presentation/screens/student/chapter_pdf.dart';
 import '../../presentation/screens/student/chapters_list_screen.dart';
@@ -94,6 +95,19 @@ class AppRouter {
             final puranId = state.pathParameters['puranId']!;
             final subjectId = state.pathParameters['subjectId']!;
             return ChapterListScreen(puranId: puranId, subjectId: subjectId);
+          },
+        ),
+        GoRoute(
+          path: AppRoutes.puranChapterContent,
+          builder: (context, state) {
+            final puranId = state.pathParameters['puranId']!;
+            final subjectId = state.pathParameters['subjectId']!;
+            final chapterId = state.pathParameters['chapterId']!;
+            return ChapterContentScreen(
+              puranId: puranId,
+              subjectId: subjectId,
+              chapterId: chapterId,
+            );
           },
         ),
         GoRoute(path: AppRoutes.calendar, builder: (context, state) => const CalendarScreen()),
@@ -296,20 +310,18 @@ class AppRouter {
         developer.log('Redirect check: authState=$authState, currentLocation=$currentLocation');
 
         // A list of routes that do not require authentication.
-        final isPublicRoute = [
-          AppRoutes.publicCourses,
-          AppRoutes.courseDetail,
-          AppRoutes.qrPayment,
-          AppRoutes.login,
-          AppRoutes.register,
-          AppRoutes.all_list_home,
-          AppRoutes.puranList,
-          AppRoutes.puranSubjects,
-          AppRoutes.puranChapters,
-          AppRoutes.calendar,
-          AppRoutes.japaCounter,
-          AppRoutes.song,
-        ].contains(currentLocation);
+        final isPublicRoute = currentLocation == AppRoutes.publicCourses ||
+            currentLocation == AppRoutes.courseDetail ||
+            currentLocation == AppRoutes.qrPayment ||
+            currentLocation == AppRoutes.login ||
+            currentLocation == AppRoutes.register ||
+            currentLocation == AppRoutes.all_list_home ||
+            currentLocation == AppRoutes.puranList ||
+            currentLocation == AppRoutes.calendar ||
+            currentLocation == AppRoutes.japaCounter ||
+            currentLocation == AppRoutes.song ||
+            currentLocation.startsWith('/puran') ||
+            currentLocation.startsWith('/publicCourses');
 
         // --- 1. Handle Initial and Loading States ---
         if (authState is AuthInitial || authState is AuthLoading) {
@@ -588,6 +600,19 @@ class AppRouter {
             return ChapterListScreen(puranId: puranId, subjectId: subjectId);
           },
         ),
+        GoRoute(
+          path: AppRoutes.puranChapterContent,
+          builder: (context, state) {
+            final puranId = state.pathParameters['puranId']!;
+            final subjectId = state.pathParameters['subjectId']!;
+            final chapterId = state.pathParameters['chapterId']!;
+            return ChapterContentScreen(
+              puranId: puranId,
+              subjectId: subjectId,
+              chapterId: chapterId,
+            );
+          },
+        ),
         GoRoute(path: AppRoutes.calendar, builder: (context, state) => const CalendarScreen()),
         GoRoute(path: AppRoutes.japaCounter, builder: (context, state) => const JapaCounterScreen()),
         GoRoute(path: AppRoutes.song, builder: (context, state) => const SongScreen()),
@@ -620,20 +645,18 @@ class AppRouter {
         developer.log('Redirect check: authState=$authState, currentLocation=$currentLocation');
 
         // A list of routes that do not require authentication.
-        final isPublicRoute = [
-          AppRoutes.publicCourses,
-          AppRoutes.courseDetail,
-          AppRoutes.qrPayment,
-          AppRoutes.login,
-          AppRoutes.register,
-          AppRoutes.home,
-          AppRoutes.puranList,
-          AppRoutes.puranSubjects,
-          AppRoutes.puranChapters,
-          AppRoutes.calendar,
-          AppRoutes.japaCounter,
-          AppRoutes.song,
-        ].contains(currentLocation);
+        final isPublicRoute = currentLocation == AppRoutes.publicCourses ||
+            currentLocation == AppRoutes.courseDetail ||
+            currentLocation == AppRoutes.qrPayment ||
+            currentLocation == AppRoutes.login ||
+            currentLocation == AppRoutes.register ||
+            currentLocation == AppRoutes.all_list_home ||
+            currentLocation == AppRoutes.puranList ||
+            currentLocation == AppRoutes.calendar ||
+            currentLocation == AppRoutes.japaCounter ||
+            currentLocation == AppRoutes.song ||
+            currentLocation.startsWith('/puran') ||
+            currentLocation.startsWith('/publicCourses');
 
         // --- 1. Handle Initial and Loading States ---
         if (authState is AuthInitial || authState is AuthLoading) {
@@ -648,7 +671,7 @@ class AppRouter {
           if (authState.pendingApproval) {
             return currentLocation != AppRoutes.pendingApproval ? AppRoutes.pendingApproval : null;
           }
-          return isPublicRoute ? null : AppRoutes.home;
+          return isPublicRoute ? null : AppRoutes.all_list_home;
         }
 
         // --- 3. Handle Authenticated State ---

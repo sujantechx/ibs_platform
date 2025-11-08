@@ -53,6 +53,7 @@ class AppRoutes {
   static const String puranList = '/puran';
   static const String puranSubjects = '/puran/:puranId/subjects';
   static const String puranChapters = '/puran/:puranId/subjects/:subjectId/chapters';
+  static const String puranChapterContent = '/puran/:puranId/subjects/:subjectId/chapters/:chapterId';
   static const String calendar = '/calendar';
   static const String japaCounter = '/japa-counter';
   static const String song = '/song';
