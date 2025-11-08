@@ -11,8 +11,9 @@ import 'admin_puran_chapters_page.dart';
 
 class AdminPuranSubjectsPage extends StatelessWidget {
   final String puranId;
+  final String puranTitle; // new: for context and forwarding
 
-  const AdminPuranSubjectsPage({super.key, required this.puranId});
+  const AdminPuranSubjectsPage({super.key, required this.puranId, required this.puranTitle});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +21,7 @@ class AdminPuranSubjectsPage extends StatelessWidget {
       create: (context) => PuranCubit(puranRepository: PuranRepository())..loadSubjects(puranId: puranId),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Manage Subjects'),
+          title: Text('Manage Subjects - $puranTitle'),
         ),
         body: BlocConsumer<PuranCubit, PuranState>(
           listener: (context, state) {
@@ -80,7 +81,7 @@ class AdminPuranSubjectsPage extends StatelessWidget {
             } else if (value == 'delete') {
               _showDeleteConfirmationDialog(context, subject);
             } else if (value == 'manage_chapters') {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => AdminPuranChaptersPage(puranId: puranId, subjectId: subject.id)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AdminPuranChaptersPage(puranId: puranId, puranTitle: puranTitle, subjectId: subject.id, subjectTitle: subject.title)));
             }
           },
           itemBuilder: (context) => [

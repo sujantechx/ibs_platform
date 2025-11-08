@@ -1,5 +1,4 @@
-// lib/presentation/screens/puran/chapter_content_screen.dart
-
+// language: dart
 import 'package:flutter/material.dart';
 import 'package:ibs_platform/presentation/screens/puran/puran_pdf.dart';
 import 'package:ibs_platform/presentation/screens/puran/puran_video.dart';
@@ -13,7 +12,12 @@ class ChapterContentScreen extends StatefulWidget {
   final String subjectId;
   final String chapterId;
 
-  const ChapterContentScreen({super.key, required this.puranId, required this.subjectId, required this.chapterId});
+  const ChapterContentScreen({
+    super.key,
+    required this.puranId,
+    required this.subjectId,
+    required this.chapterId,
+  });
 
   @override
   State<ChapterContentScreen> createState() => _ChapterContentScreenState();
@@ -25,23 +29,30 @@ class _ChapterContentScreenState extends State<ChapterContentScreen> {
   @override
   void initState() {
     super.initState();
-    // Defensive checks: if any id is empty, create a future that throws for clear error display
-    if (widget.puranId.isEmpty || widget.subjectId.isEmpty || widget.chapterId.isEmpty) {
-      _chapterFuture = Future<ChapterModel>.error('Invalid IDs provided for chapter content');
-    } else {
-      _chapterFuture = PuranRepository().getChapter(
-        puranId: widget.puranId,
-        subjectId: widget.subjectId,
-        chapterId: widget.chapterId,
-      );
-    }
+    _chapterFuture = PuranRepository().getChapter(
+      puranId: widget.puranId,
+      subjectId: widget.subjectId,
+      chapterId: widget.chapterId,
+    );
+  }
+
+  Widget _sectionHeader(String title, IconData icon) {
+    return Row(
+      children: [
+        Icon(icon, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(title, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+      ],
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Chapter Content'),
+        title: const Text("Chapter Content"),
+        centerTitle: false,
+        elevation: 1,
       ),
       body: FutureBuilder<ChapterModel>(
         future: _chapterFuture,
@@ -50,70 +61,130 @@ class _ChapterContentScreenState extends State<ChapterContentScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('Error loading chapter: ${snapshot.error}'));
+            return Center(child: Text("Error: ${snapshot.error}"));
           }
-          if (!snapshot.hasData) {
-            return const Center(child: Text('Chapter not found.'));
-          }
+          if (!snapshot.hasData) return const Center(child: Text("No data found"));
 
           final chapter = snapshot.data!;
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Text Content:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                if (chapter.textContent != null && chapter.textContent!.trim().isNotEmpty)
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        MaterialPageRoute(
-                          builder: (context) => TextViewerScreen(text: chapter.textContent!),
+          return ListView(
+            padding: const EdgeInsets.all(16),
+            children: [
+              // TEXT CONTENT PREVIEW (modern card)
+              _sectionHeader("Text", Icons.article),
+              const SizedBox(height: 8),
+              Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 2,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: (chapter.textContent != null && chapter.textContent!.trim().isNotEmpty)
+                      ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => TextViewerScreen(text: chapter.textContent!)),
+                    );
+                  }
+                      : null,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            (chapter.textContent != null && chapter.textContent!.trim().isNotEmpty)
+                                ? chapter.textContent!
+                                : "No text available",
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
                         ),
-                      );
-                    },
-                    child: Text(
-                      chapter.textContent!,
-                      style: const TextStyle(fontSize: 16, color: Colors.blue),
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
+                        const SizedBox(width: 12),
+                        Icon(
+                          Icons.chevron_right,
+                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                        )
+                      ],
                     ),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // PDF SECTION COLLAPSIBLE (hide raw url, show friendly label)
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: _sectionHeader("PDFs", Icons.picture_as_pdf),
+                childrenPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                children: (chapter.pdfs != null && chapter.pdfs!.isNotEmpty)
+                    ? List.generate(chapter.pdfs!.length, (index) {
+                  final pdfUrl = chapter.pdfs![index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.12),
+                        child: Icon(Icons.picture_as_pdf, color: Theme.of(context).colorScheme.primary),
+                      ),
+                      title: Text("PDF ${index + 1}", style: Theme.of(context).textTheme.bodyLarge),
+                      subtitle: const Text("Tap to open"),
+                      trailing: const Icon(Icons.open_in_new),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => PuranPdf(url: pdfUrl)),
+                        );
+                      },
+                    ),
+                  );
+                })
+                    : [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Center(child: Text("No PDFs available", style: Theme.of(context).textTheme.bodySmall)),
                   )
-                else
-                  const Text('No text content available yet.', style: TextStyle(fontSize: 16)),
-                const SizedBox(height: 20),
-                const Text('PDFs:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                if (chapter.pdfs != null && chapter.pdfs!.isNotEmpty)
-                  ...chapter.pdfs!.map((pdf) => ListTile(
-                        leading: const Icon(Icons.picture_as_pdf),
-                        title: Text(pdf),
-                        onTap: () {
-                          // You can integrate url_launcher to open this URL.
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => PuranPdf(url:pdf),));
-                          },
-                      ))
-                else
-                  const Text('No PDFs available yet.', style: TextStyle(fontSize: 16)),
+                ],
+              ),
 
-                const SizedBox(height: 20),
-                const Text('Videos:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                if (chapter.videos != null && chapter.videos!.isNotEmpty)
-                  ...chapter.videos!.map((video) => ListTile(
-                        leading: const Icon(Icons.ondemand_video),
-                        title: Text(video),
-                    onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PuranVideo(videoId: video,),));
+              const SizedBox(height: 12),
 
-                    },
-                      ))
-                else
-                  const Text('No videos available yet.', style: TextStyle(fontSize: 16)),
-              ],
-            ),
+              // VIDEO SECTION COLLAPSIBLE (hide raw id, show friendly label)
+              ExpansionTile(
+                tilePadding: EdgeInsets.zero,
+                title: _sectionHeader("Videos", Icons.ondemand_video),
+                childrenPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                children: (chapter.videos != null && chapter.videos!.isNotEmpty)
+                    ? List.generate(chapter.videos!.length, (index) {
+                  final videoId = chapter.videos![index];
+                  return Card(
+                    margin: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Theme.of(context).colorScheme.secondary.withOpacity(0.12),
+                        child: Icon(Icons.play_arrow, color: Theme.of(context).colorScheme.secondary),
+                      ),
+                      title: Text("Video ${index + 1}", style: Theme.of(context).textTheme.bodyLarge),
+                      subtitle: const Text("Tap to play"),
+                      trailing: const Icon(Icons.open_in_new),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => PuranVideo(videoId: videoId)),
+                        );
+                      },
+                    ),
+                  );
+                })
+                    : [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Center(child: Text("No videos available", style: Theme.of(context).textTheme.bodySmall)),
+                  )
+                ],
+              ),
+            ],
           );
         },
       ),

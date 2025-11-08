@@ -78,7 +78,7 @@ class ManagePuranScreen extends StatelessWidget {
             } else if (value == 'delete') {
               _showDeleteConfirmationDialog(context, puran);
             } else if (value == 'manage_subjects') {
-              Navigator.push(context, MaterialPageRoute(builder: (context) => AdminPuranSubjectsPage(puranId: puran.id)));
+              Navigator.push(context, MaterialPageRoute(builder: (context) => AdminPuranSubjectsPage(puranId: puran.id, puranTitle: puran.title)));
             }
           },
           itemBuilder: (context) => [

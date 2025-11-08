@@ -7,12 +7,15 @@ import '../../../data/repositories/puran_repository.dart';
 import '../../../logic/puran/puran_cubit.dart';
 import '../../../logic/puran/puran_state.dart';
 import '../../../data/models/chapter_model.dart';
+import 'package:ibs_platform/presentation/screens/admin/admin_puran_content_page.dart';
 
 class AdminPuranChaptersPage extends StatelessWidget {
   final String puranId;
+  final String puranTitle;
   final String subjectId;
+  final String subjectTitle;
 
-  const AdminPuranChaptersPage({super.key, required this.puranId, required this.subjectId});
+  const AdminPuranChaptersPage({super.key, required this.puranId, required this.puranTitle, required this.subjectId, required this.subjectTitle});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +23,7 @@ class AdminPuranChaptersPage extends StatelessWidget {
       create: (context) => PuranCubit(puranRepository: PuranRepository())..loadChapters(puranId: puranId, subjectId: subjectId),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Manage Chapters'),
+          title: Text('Manage Chapters - $subjectTitle'),
         ),
         body: BlocConsumer<PuranCubit, PuranState>(
           listener: (context, state) {
@@ -78,9 +81,23 @@ class AdminPuranChaptersPage extends StatelessWidget {
               _showAddOrEditChapterDialog(context, chapter: chapter);
             } else if (value == 'delete') {
               _showDeleteConfirmationDialog(context, chapter);
+            } else if (value == 'manage_content') {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => AdminPuranContentPage(
+                    puranTitle: puranTitle,
+                    subjectTitle: subjectTitle,
+                    puranId: puranId,
+                    subjectId: subjectId,
+                    chapterId: chapter.id,
+                  ),
+                ),
+              );
             }
           },
           itemBuilder: (context) => [
+            const PopupMenuItem(value: 'manage_content', child: Text('Manage Content')),
             const PopupMenuItem(value: 'edit', child: Text('Edit')),
             const PopupMenuItem(value: 'delete', child: Text('Delete')),
           ],
