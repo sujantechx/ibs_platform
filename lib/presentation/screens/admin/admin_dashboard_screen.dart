@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../logic/auth/auth_bloc.dart';
 import '../Courses/manage_courses_screen.dart';
+import 'manage_puran_screen.dart';
 
 
 class AdminDashboardScreen extends StatelessWidget {
@@ -57,17 +58,17 @@ class AdminDashboardScreen extends StatelessWidget {
                       },
                     ),
                   ),
-                  /*Card(
+                  const Divider(),
+                  Card(
                     child: ListTile(
-                      leading: const Icon(Icons.video_library_outlined),
-                      title: const Text('Manage Course Content'),
-                      subtitle: const Text('Add subjects, chapters, videos, and PDFs'),
-                      onTap: (){
-                        // context.pushNamed(AppRoutes.AdminSubjects);
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => AdminSubjectsPage(),));
+                      leading: const Icon(Icons.library_books),
+                      title: const Text('Manage Vaishnav Puran Content'),
+                      subtitle: const Text('purans, subjects, chapters, content'),
+                      onTap: () {
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ManagePuranScreen()));
                       },
                     ),
-                  ),*/
+                  ),
                   // Placeholder for future admin features
                   const Divider(),
                   Card(

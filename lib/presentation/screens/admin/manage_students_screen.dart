@@ -229,8 +229,13 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
                               Text('Phone: ${user.phone}'),
                               Text('Payment ID: ${user.paymentId}'),
                               // ✅ Added FutureBuilder for course name
-                              FutureBuilder<DocumentSnapshot>(
-                                future: FirebaseFirestore.instance.collection('courses').doc(user.courseId).get(),
+                              user.courseId == null || user.courseId.trim().isEmpty
+                                  ? const Text('Course Name: Not Assigned')
+                                  : FutureBuilder<DocumentSnapshot>(
+                                future: FirebaseFirestore.instance
+                                    .collection('courses')
+                                    .doc(user.courseId)
+                                    .get(),
                                 builder: (context, snapshot) {
                                   if (snapshot.connectionState == ConnectionState.waiting) {
                                     return const Text('Course Name: Loading...');
@@ -238,11 +243,13 @@ class _ManageStudentsScreenState extends State<ManageStudentsScreen> {
                                   if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
                                     return const Text('Course Name: Not Found');
                                   }
-                                  final courseData = snapshot.data!.data() as Map<String, dynamic>;
-                                  return Text('Course Name: ${courseData['title']}');
+                                  final courseData = snapshot.data!.data() as Map<String, dynamic>?;
+                                  final title = (courseData != null && courseData['title'] != null)
+                                      ? courseData['title'] as String
+                                      : 'Unnamed Course';
+                                  return Text('Course Name: $title');
                                 },
-                              ),
-                              const SizedBox(height: 8),
+                              ),                              const SizedBox(height: 8),
                               Text('Active Token: ${user.activeToken ?? 'None'}'),
                               FutureBuilder<int>(
                                 future: context.read<AuthRepository>().getHistoricalDeviceCount(user.uid),
