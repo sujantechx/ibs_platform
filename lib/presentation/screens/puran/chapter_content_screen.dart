@@ -1,6 +1,9 @@
 // lib/presentation/screens/puran/chapter_content_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:ibs_platform/presentation/screens/puran/puran_pdf.dart';
+import 'package:ibs_platform/presentation/screens/puran/puran_video.dart';
+import 'package:ibs_platform/presentation/screens/puran/text_viewer_screen.dart';
 
 import '../../../data/repositories/puran_repository.dart';
 import '../../../data/models/chapter_model.dart';
@@ -63,11 +66,24 @@ class _ChapterContentScreenState extends State<ChapterContentScreen> {
                 const Text('Text Content:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 if (chapter.textContent != null && chapter.textContent!.trim().isNotEmpty)
-                  Text(chapter.textContent!, style: const TextStyle(fontSize: 16))
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => TextViewerScreen(text: chapter.textContent!),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      chapter.textContent!,
+                      style: const TextStyle(fontSize: 16, color: Colors.blue),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  )
                 else
                   const Text('No text content available yet.', style: TextStyle(fontSize: 16)),
                 const SizedBox(height: 20),
-
                 const Text('PDFs:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 8),
                 if (chapter.pdfs != null && chapter.pdfs!.isNotEmpty)
@@ -76,8 +92,8 @@ class _ChapterContentScreenState extends State<ChapterContentScreen> {
                         title: Text(pdf),
                         onTap: () {
                           // You can integrate url_launcher to open this URL.
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Open PDF: $pdf')));
-                        },
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => PuranPdf(url:pdf),));
+                          },
                       ))
                 else
                   const Text('No PDFs available yet.', style: TextStyle(fontSize: 16)),
@@ -89,10 +105,10 @@ class _ChapterContentScreenState extends State<ChapterContentScreen> {
                   ...chapter.videos!.map((video) => ListTile(
                         leading: const Icon(Icons.ondemand_video),
                         title: Text(video),
-                        onTap: () {
-                          // You can integrate url_launcher to open this URL.
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Open Video: $video')));
-                        },
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => PuranVideo(videoId: video,),));
+
+                    },
                       ))
                 else
                   const Text('No videos available yet.', style: TextStyle(fontSize: 16)),

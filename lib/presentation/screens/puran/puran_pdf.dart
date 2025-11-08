@@ -29,15 +29,24 @@ class _PuranPdfState extends State<PuranPdf> {
   // Download the PDF from the URL and save it to a temporary local file
   Future<void> _downloadAndPreparePdf() async {
     try {
+      String downloadUrl = widget.url;
+      // If it's a Google Drive link, convert to direct download
+      if (downloadUrl.contains('drive.google.com')) {
+        final fileId = _extractGoogleDriveFileId(downloadUrl);
+        if (fileId != null) {
+          downloadUrl = 'https://drive.google.com/uc?export=download&id=$fileId';
+        }
+      }
+
       // Fetch the PDF from the provided URL
-      final response = await http.get(Uri.parse(widget.url));
+      final response = await http.get(Uri.parse(downloadUrl));
       if (response.statusCode != 200) {
         throw Exception('Failed to download PDF: HTTP ${response.statusCode}');
       }
 
       // Save the PDF to a temporary file
       final tempDir = await getTemporaryDirectory();
-      final fileName = widget.url.split('/').last;
+      final fileName = downloadUrl.split('/').last.split('?').first; // Better filename extraction
       final file = File('${tempDir.path}/$fileName');
       await file.writeAsBytes(response.bodyBytes); // Write the downloaded bytes to the file
 
@@ -53,6 +62,17 @@ class _PuranPdfState extends State<PuranPdf> {
         _isLoading = false;
       });
     }
+  }
+
+  String? _extractGoogleDriveFileId(String url) {
+    final uri = Uri.parse(url);
+    if (uri.host == 'drive.google.com' && uri.pathSegments.contains('file') && uri.pathSegments.contains('d')) {
+      final index = uri.pathSegments.indexOf('d');
+      if (index + 1 < uri.pathSegments.length) {
+        return uri.pathSegments[index + 1];
+      }
+    }
+    return null;
   }
 
   @override
