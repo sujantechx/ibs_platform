@@ -117,11 +117,9 @@ class AppRouter {
           // Routes that are for authentication (splash, login, etc.)
           final isAuthRoute = [
             AppRoutes.splash,
-            AppRoutes.login,
             AppRoutes.register,
             AppRoutes.pendingApproval,
           ].contains(currentLocation);
-
           if (user.role == 'admin') {
             // Admin-specific routes
             // final isAdminRoute =

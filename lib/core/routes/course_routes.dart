@@ -56,25 +56,5 @@ class AppRoutesCourses {
   static const String courseDetail = '/course-detail';
   static const String qrPayment = '/qr-payment';
 
-  // New: expose a list of GoRouter routes so the main AppRouter can spread them
-  static List<RouteBase> get routes => [
-        GoRoute(
-          path: publicCourses,
-          builder: (context, state) => const PublicCoursesScreen(),
-        ),
-        GoRoute(
-          path: courseDetail,
-          builder: (context, state) {
-            final course = state.extra as CoursesModel;
-            return CourseDetailPage(course: course);
-          },
-        ),
-        GoRoute(
-          path: qrPayment,
-          builder: (context, state) {
-            final course = state.extra as CoursesModel;
-            return QrPaymentScreen(course: course);
-          },
-        ),
-      ];
+  static var routes;
 }
