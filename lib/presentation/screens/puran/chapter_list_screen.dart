@@ -1,5 +1,7 @@
 // lib/presentation/screens/puran/chapter_list_screen.dart
 
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -34,7 +36,14 @@ class ChapterListScreen extends StatelessWidget {
                   final chapter = state.chapters[index];
                   return ListTile(
                     title: Text(chapter.title),
+                    subtitle: Text(chapter.id),
                     onTap: () {
+                      // Defensive logging before navigation
+                      developer.log('Chapter tapped: puranId=$puranId subjectId=$subjectId chapterId=${chapter.id}');
+                      assert(puranId.isNotEmpty, 'puranId is empty when navigating to ChapterContentScreen');
+                      assert(subjectId.isNotEmpty, 'subjectId is empty when navigating to ChapterContentScreen');
+                      assert(chapter.id.isNotEmpty, 'chapter.id is empty when navigating to ChapterContentScreen');
+
                       // Navigate to content screen
                       Navigator.push(context, MaterialPageRoute(builder: (context) => ChapterContentScreen(puranId: puranId, subjectId: subjectId, chapterId: chapter.id)));
                     },

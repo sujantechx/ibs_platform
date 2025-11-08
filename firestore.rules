@@ -3,79 +3,102 @@ service cloud.firestore {
   match /databases/{database}/documents {
 
     // --- HELPER FUNCTIONS ---
+    // Safe helpers: always check request.auth != null before calling get()
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
     function getAuthUserDoc() {
       return get(/databases/$(database)/documents/users/$(request.auth.uid));
     }
 
     function isApprovedUser() {
-      return request.auth != null && getAuthUserDoc().data.status == 'approved';
+      return isSignedIn() && getAuthUserDoc().data.status == 'approved';
     }
 
     function isAdmin() {
-      return request.auth != null && getAuthUserDoc().data.role == 'admin';
+      return isSignedIn() && getAuthUserDoc().data.role == 'admin';
     }
 
     // --- PUBLIC ACCESS FOR COURSE LIST ---
     match /courses/{courseId} {
       allow read;
+      // Only admins can write courses
+      allow create, update, delete: if isAdmin();
     }
 
-    // --- PUBLIC ACCESS FOR VAISHNAV PURAN LIST ---
+    // --- PUBLIC ACCESS FOR VAISHNAV PURAN (READ-ONLY FOR PUBLIC) ---
+    // Top-level puran collection: public read, admin-only writes.
     match /vaishnav_puran/{puranId} {
       allow read;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Also support older/alternate collection name `puran` which your app logs show.
+    match /puran/{puranId} {
+      allow read;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Nested content under vaishnav_puran (subjects, chapters, etc.)
+    // Public read access; only admins may create/update/delete.
+    match /vaishnav_puran/{puranId}/{document=**} {
+      allow read;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Nested content under `puran` as well
+    match /puran/{puranId}/{document=**} {
+      allow read;
+      allow create, update, delete: if isAdmin();
     }
 
     // --- USER PROFILE & DEVICES ---
     match /users/{uid} {
-      allow read: if request.auth != null && request.auth.uid == uid;
-      allow create: if request.auth != null && request.auth.uid == uid &&
-                    request.resource.data.role == 'student' &&
-                    request.resource.data.status == 'pending';
-      // ✅ CORRECTED: A user can update their fcmToken and activeToken.
-      // This is necessary for a single-device login to work.
-      allow update: if request.auth != null && request.auth.uid == uid && (
-        // Only allow these specific fields to be updated by the user
-        ('fcmToken' in request.resource.data) ||
-        ('activeToken' in request.resource.data)
-      );
+      // A user can read their own user doc
+      allow read: if isSignedIn() && request.auth.uid == uid;
 
-      // Admins have full access.
-      allow read, write: if isAdmin();
-      // An admin can write to ANY user document
-      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+      // A new user may create their own user document during signup
+      allow create: if isSignedIn() && request.auth.uid == uid
+                    && request.resource.data.role == 'student'
+                    && request.resource.data.status == 'pending';
 
-      // ✅ A user can only write to their own device document.
+      // Users may only update a limited set of fields on their own doc (e.g. device tokens).
+      // Admins may update any user document.
+      allow update: if (isSignedIn() && request.auth.uid == uid && (
+                        ('fcmToken' in request.resource.data) ||
+                        ('activeToken' in request.resource.data)
+                      )) || isAdmin();
+
+      // Only admins can delete user documents.
+      allow delete: if isAdmin();
+
+      // Devices subcollection: users may read/write their own device docs; admins may read/write all.
       match /devices/{deviceId} {
-        allow read: if request.auth != null && request.auth.uid == uid;
-        allow write: if request.auth != null && request.auth.uid == uid && isApprovedUser();
-        allow read, write: if isAdmin();
+        allow read: if isSignedIn() && request.auth.uid == uid;
+        allow write: if (isSignedIn() && request.auth.uid == uid && isApprovedUser()) || isAdmin();
       }
     }
-    // ✅ SOLUTION: Add a new rule for the 'notifications' collection
+
+    // Notifications: admin writes, recipient or admin reads
     match /notifications/{notificationId} {
-      // Only admins can write (create, update, delete) notifications.
-      allow write: if isAdmin();
-
-      // Admins and the recipient of the notification can read it.
-      allow read: if isAdmin() || (request.auth != null && request.auth.uid == resource.data.userId);
+      allow create, update, delete: if isAdmin();
+      allow read: if isAdmin() || (isSignedIn() && request.auth.uid == resource.data.userId);
     }
 
-    // --- SECURE NESTED CONTENT (READ-ONLY FOR USERS) ---
+    // --- SECURE NESTED CONTENT (example for courses nested docs) ---
     match /courses/{courseId}/{document=**} {
-      allow read, write: if isAdmin();
       allow read: if isApprovedUser() && getAuthUserDoc().data.courseId == courseId;
+      allow create, update, delete: if isAdmin();
     }
 
-    // --- PUBLIC NESTED CONTENT FOR VAISHNAV PURAN ---
-    match /vaishnav_puran/{puranId}/{document=**} {
-      allow read, write: if isAdmin();
-      allow read; // Public read access
-    }
-
+    // Results collection
     match /results/{documentId} {
-      allow read: if request.auth != null && request.auth.uid == resource.data.userId;
-      allow create, update: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read: if isSignedIn() && request.auth.uid == resource.data.userId;
+      allow create, update: if isSignedIn() && request.auth.uid == request.resource.data.userId;
       allow delete: if isAdmin();
     }
+
+    // Fallback: deny by default (implicitly enforced)
   }
 }

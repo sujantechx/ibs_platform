@@ -117,10 +117,10 @@ class PuranCubit extends Cubit<PuranState> {
   }
 
   /// Adds a chapter.
-  Future<void> addChapter({required String puranId, required String subjectId, required String title}) async {
+  Future<void> addChapter({required String puranId, required String subjectId, required String title, String? textContent, List<String>? pdfs, List<String>? videos}) async {
     emit(PuranLoading());
     try {
-      await _puranRepository.addChapter(puranId: puranId, subjectId: subjectId, title: title);
+      await _puranRepository.addChapter(puranId: puranId, subjectId: subjectId, title: title, textContent: textContent, pdfs: pdfs, videos: videos);
       emit(PuranSuccess('Chapter added successfully!'));
       loadChapters(puranId: puranId, subjectId: subjectId); // Refresh
     } catch (e) {
@@ -147,6 +147,17 @@ class PuranCubit extends Cubit<PuranState> {
       await _puranRepository.deleteChapter(puranId: puranId, subjectId: subjectId, chapterId: chapterId);
       emit(PuranSuccess('Chapter deleted successfully!'));
       loadChapters(puranId: puranId, subjectId: subjectId); // Refresh
+    } catch (e) {
+      emit(PuranError(e.toString()));
+    }
+  }
+
+  /// Fetches a single chapter with content.
+  Future<void> loadChapterContent({required String puranId, required String subjectId, required String chapterId}) async {
+    emit(PuranLoading());
+    try {
+      final chapter = await _puranRepository.getChapter(puranId: puranId, subjectId: subjectId, chapterId: chapterId);
+      emit(ChapterContentLoaded(chapter));
     } catch (e) {
       emit(PuranError(e.toString()));
     }

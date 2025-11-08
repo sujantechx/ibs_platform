@@ -92,20 +92,38 @@ class AdminPuranChaptersPage extends StatelessWidget {
   void _showAddOrEditChapterDialog(BuildContext context, {ChapterModel? chapter}) {
     final cubit = context.read<PuranCubit>();
     final titleController = TextEditingController(text: chapter?.title ?? '');
+    final textContentController = TextEditingController(text: chapter?.textContent ?? '');
+    final pdfsController = TextEditingController(text: chapter?.pdfs?.join(', ') ?? '');
+    final videosController = TextEditingController(text: chapter?.videos?.join(', ') ?? '');
 
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
           title: Text(chapter == null ? 'Add Chapter' : 'Edit Chapter'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: titleController,
-                decoration: const InputDecoration(labelText: 'Title'),
-              ),
-            ],
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: titleController,
+                  decoration: const InputDecoration(labelText: 'Title'),
+                ),
+                TextField(
+                  controller: textContentController,
+                  decoration: const InputDecoration(labelText: 'Text Content'),
+                  maxLines: 3,
+                ),
+                TextField(
+                  controller: pdfsController,
+                  decoration: const InputDecoration(labelText: 'PDF URLs (comma-separated)'),
+                ),
+                TextField(
+                  controller: videosController,
+                  decoration: const InputDecoration(labelText: 'Video URLs (comma-separated)'),
+                ),
+              ],
+            ),
           ),
           actions: [
             TextButton(
@@ -115,15 +133,31 @@ class AdminPuranChaptersPage extends StatelessWidget {
             TextButton(
               onPressed: () {
                 final title = titleController.text.trim();
+                final textContent = textContentController.text.trim();
+                final pdfs = pdfsController.text.trim().isEmpty ? <String>[] : pdfsController.text.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
+                final videos = videosController.text.trim().isEmpty ? <String>[] : videosController.text.split(',').map((s) => s.trim()).where((s) => s.isNotEmpty).toList();
                 if (title.isNotEmpty) {
                   if (chapter == null) {
-                    cubit.addChapter(puranId: puranId, subjectId: subjectId, title: title);
+                    cubit.addChapter(
+                      puranId: puranId,
+                      subjectId: subjectId,
+                      title: title,
+                      textContent: textContent.isEmpty ? null : textContent,
+                      pdfs: pdfs,
+                      videos: videos,
+                    );
                   } else {
                     cubit.updateChapter(
                       puranId: puranId,
                       subjectId: subjectId,
                       chapterId: chapter.id,
-                      data: {'title': title, 'updatedAt': Timestamp.now()},
+                      data: {
+                        'title': title,
+                        'textContent': textContent.isEmpty ? null : textContent,
+                        'pdfs': pdfs,
+                        'videos': videos,
+                        'updatedAt': Timestamp.now(),
+                      },
                     );
                   }
                   Navigator.of(context).pop();

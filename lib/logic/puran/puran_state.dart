@@ -28,6 +28,13 @@ class ChaptersLoaded extends PuranState {
   ChaptersLoaded(this.chapters);
 }
 
+// New: state used when a single chapter (with full content) is loaded.
+class ChapterContentLoaded extends PuranState {
+  final ChapterModel chapter;
+
+  ChapterContentLoaded(this.chapter);
+}
+
 class PuranError extends PuranState {
   final String message;
 
