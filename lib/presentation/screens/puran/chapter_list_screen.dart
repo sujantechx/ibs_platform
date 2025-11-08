@@ -7,6 +7,7 @@ import '../../../data/repositories/puran_repository.dart';
 import '../../../logic/puran/puran_cubit.dart';
 import '../../../logic/puran/puran_state.dart';
 import '../../../data/models/chapter_model.dart';
+import 'chapter_content_screen.dart'; // Import the content screen
 
 class ChapterListScreen extends StatelessWidget {
   final String puranId;
@@ -34,11 +35,8 @@ class ChapterListScreen extends StatelessWidget {
                   return ListTile(
                     title: Text(chapter.title),
                     onTap: () {
-                      // Navigate to content screen, assuming content is in chapters
-                      // For now, just show a placeholder
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Content for ${chapter.title}')),
-                      );
+                      // Navigate to content screen
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => ChapterContentScreen(puranId: puranId, subjectId: subjectId, chapterId: chapter.id)));
                     },
                   );
                 },

@@ -33,3 +33,9 @@ class PuranError extends PuranState {
 
   PuranError(this.message);
 }
+
+class PuranSuccess extends PuranState {
+  final String message;
+
+  PuranSuccess(this.message);
+}
