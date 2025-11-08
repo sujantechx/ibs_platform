@@ -1,46 +1,59 @@
-import 'package:flutter/material.dart';
-import 'package:ibs_platform/calendar/ui/calendar_dashboard.dart';
-import 'package:ibs_platform/japa_counter/ui/japa_counter_dashboard.dart';
-import 'package:ibs_platform/vaishnav_puran/ui/vaishnav_puran_dashboard.dart';
-import 'package:ibs_platform/vaishnav_song/ui/vaishnav_song_dashboard.dart';
-import 'package:ibs_platform/home/home_page.dart';
-import 'package:ibs_platform/splash/splash_page.dart';
-import '../../courses/ui/presentation/screens/splash/splash_screen.dart';
+// lib/core/routes/app_routes.dart
 
 class AppRoutes {
+
+  // Core & Authentication Routes
   static const String splash = '/';
-  static const String home = '/home';
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String pendingApproval = '/pending-approval';
+
+
+
+  // Student-Facing Routes
+
+
+  //  Student Dashboard Shell Tabs
+  // These are the entry points for the bottom navigation bar.
+  static const String subjectsList = '/subjects'; // The first tab and main student screen.
+  static const String subjectPDF = '/subjectPDF';
+  static const String  testSubject = '/testSubject';
+  static const String profile = '/profile';
+
+  //  Student Content Drill-Down
+  // These screens are pushed on top of the shell.
+  static const String chaptersList = '/chapters';
+  static const String chapterPDF = '/chapterPDF';
+  static const String pdfViewer = '/pdf-viewer';
+  static const String pdfList = '/pdf-list';
+  static const String videosList = '/videos-list';
+  static const String videoPlayer = '/video-player';
+  static const String  testScreen = '/testScreen';
+  static const String  testChapter = '/testChapter';
+  static const String  quizResult = '/quizResult';
+
+  // Admin Panel Routes
+
+  static const String adminDashboard = '/admin'; // Main dashboard for admins.
+  static const String manageStudents = '/admin/manage-students';
+  static const String adminContent = '/admin/manage-content';
+  static const String AdminChapters = '/admin/manage-chapters';
+  static const String AdminSubjects = '/admin/manage-subject';
+  static const String adminVideoPlayer = '/admin/video-player';
+  static const String adminPdfViewer = '/admin/pdf-viewer';
+  static const String manageCourses = '/admin/manage-courses';
+  static const String managesQuestions = '/admin/manage-questions';
+
+// static const String AdminChapters = '/admin/manage-chapters';
+// We will add '/admin/manage-videos' here in the next step.
+  static const String publicCourses = '/publicCourses'; // Make this the root
+  static const String courseDetail = '/course-detail';
+  static const String qrPayment = '/qr-payment';
+  static const String all_list_home = '/all_list_home';
+  static const String puranList = '/puran';
+  static const String puranSubjects = '/puran/:puranId/subjects';
+  static const String puranChapters = '/puran/:puranId/subjects/:subjectId/chapters';
   static const String calendar = '/calendar';
-  static const String courses = '/courses';
   static const String japaCounter = '/japa-counter';
-  static const String vaishnavPuran = '/vaishnav-puran';
-  static const String vaishnavSong = '/vaishnav-song';
-
-  static Route<dynamic> generateRoute(RouteSettings settings) {
-    switch (settings.name) {
-      case splash:
-        return MaterialPageRoute(builder: (_) => const SplashPage());
-      case home:
-        return MaterialPageRoute(builder: (_) => const HomePage());
-      case calendar:
-        return MaterialPageRoute(builder: (_) => const CalendarDashboard());
-      case courses:
-        return MaterialPageRoute(builder: (_) => const SplashScreen());
-      case japaCounter:
-        return MaterialPageRoute(builder: (_) => const JapaCounterDashboard());
-      case vaishnavPuran:
-        return MaterialPageRoute(builder: (_) => const VaishnavPuranDashboard());
-      case vaishnavSong:
-        return MaterialPageRoute(builder: (_) => const VaishnavSongDashboard());
-      default:
-        return MaterialPageRoute(
-          builder: (_) => Scaffold(
-            body: Center(
-              child: Text('No route defined for ${settings.name}'),
-            ),
-          ),
-        );
-    }
-  }
+  static const String song = '/song';
 }
-
